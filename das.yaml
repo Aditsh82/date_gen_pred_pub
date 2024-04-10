@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: IAM Role for S3 Bucket Policy Access
+Parameters:
+  BucketName:
+    Type: String
+    Description: The name of the S3 bucket
+Resources:
+  S3BucketPolicyRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: S3BucketPolicyRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: S3BucketPolicyAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketNotification
+                  - s3:PutBucketNotification
+                Resource: 
+                  - !Sub 'arn:aws:s3:::${BucketName}'
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketPolicy
+                  - s3:PutBucketPolicy
+                Resource: 
+                  - !Sub 'arn:aws:s3:::${BucketName}'
+Outputs:
+  RoleARN:
+    Description: ARN of the IAM role
+    Value: !GetAtt S3BucketPolicyRole.Arn
